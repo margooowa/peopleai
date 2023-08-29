@@ -1,0 +1,67 @@
+I need java function that accepts a enum DESC or ASC as an attribute and can sort data by ` name/common `.  
+ChatGPT
+
+Sure, I can help you with that! Here's a Java function that accepts an enum (either ASC or DESC) and a list of data objects, and sorts the data based on the name or common attribute:
+
+java
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+enum SortOrder {
+    ASC, DESC
+}
+
+class Data {
+    private String name;
+    private String common;
+
+    public Data(String name, String common) {
+        this.name = name;
+        this.common = common;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getCommon() {
+        return common;
+    }
+}
+
+public class SortingExample {
+    public static void sortData(List<Data> dataList, SortOrder sortOrder) {
+        Collections.sort(dataList, new Comparator<Data>() {
+            @Override
+            public int compare(Data data1, Data data2) {
+                if (sortOrder == SortOrder.ASC) {
+                    return data1.getName().compareTo(data2.getName());
+                } else {
+                    return data2.getName().compareTo(data1.getName());
+                }
+            }
+        });
+    }
+
+    public static void main(String[] args) {
+        List<Data> dataList = List.of(
+                new Data("Apple", "Fruit"),
+                new Data("Banana", "Fruit"),
+                new Data("Carrot", "Vegetable"),
+                new Data("Date", "Fruit")
+        );
+
+        SortOrder sortOrder = SortOrder.DESC;
+        sortData(dataList, sortOrder);
+
+        for (Data data : dataList) {
+            System.out.println("Name: " + data.getName() + ", Common: " + data.getCommon());
+        }
+    }
+}
+
+In this example, the sortData function takes a list of Data objects and a SortOrder enum as arguments. The Comparator inside the Collections.sort method is used to compare the name attribute of the Data objects based on the specified sort order.
+
+You can replace the SortOrder.DESC with SortOrder.ASC to sort in ascending order. Just make sure to adjust the comparison logic accordingly if you want to sort by the common attribute instead.
