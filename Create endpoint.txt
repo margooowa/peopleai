@@ -1,0 +1,690 @@
+Chat history
+New chat
+Close sidebar
+Today
+
+Spring Boot Country Endpoint
+
+    South Africa Information
+
+Yesterday
+
+    [M]
+
+Previous 7 Days
+
+    Name: Your Personal Choice
+
+Previous 30 Days
+
+Mermaid Diagram Basics
+Cannot draw, text interface.
+Optimizing JSON API.
+Extract & Set OfferID
+Travel AI Agent Build
+НВТ: Зупинка навчання.
+Postman Pre-Script Setup
+
+    Amadeus SOAP Header Setup
+
+July
+
+Pseudonyms for Vitalii Kozub
+
+    Assist User - 1
+
+June
+
+Тематика дипломної роботи
+
+    ФВ ЛШ для дитини
+
+May
+
+New chat
+Список літер, літери "а"
+TravelSafe
+Spirit NK NDC API Integration
+
+    Підпис для сімейної фотосесії.
+
+April
+
+FCPA's Role in Record-Keeping
+Допомога з запитом.
+Гаррі Поттер: Є!
+Динозаври в пригоді.
+Trademark Usage Contract.
+Допомога користувачу.
+
+    Динозавричі друзі.
+
+Default (GPT-3.5)
+User
+Hi I need spring boot application. Create endpoint that can can accept 4 optional parameters. 1: county String. 2: population: Long, 3: sord with Enum: DESC, ASC. 4. limit integer. THie endpoint need to produce xml or json. Also I need make request to https://restcountries.com/v3.1/all and parse result list to json
+ChatGPT
+
+Sure, I can help you with that. Below is a basic example of a Spring Boot application with an endpoint that accepts optional parameters and produces XML or JSON output. It also makes a request to the given API and processes the response.
+
+java
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@SpringBootApplication
+public class SpringBootApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(SpringBootApp.class, args);
+    }
+}
+
+@RestController
+class CountryController {
+
+    private final String API_URL = "https://restcountries.com/v3.1/all";
+
+    @GetMapping(value = "/countries", produces = {"application/xml", "application/json"})
+    public ResponseEntity<List<Country>> getCountries(
+            @RequestParam(required = false) String county,
+            @RequestParam(required = false) Long population,
+            @RequestParam(required = false) SortOrder sortOrder,
+            @RequestParam(required = false) Integer limit) {
+
+        RestTemplate restTemplate = new RestTemplate();
+        Country[] countries = restTemplate.getForObject(API_URL, Country[].class);
+
+        List<Country> filteredCountries = filterCountries(countries, county, population);
+        sortCountries(filteredCountries, sortOrder);
+        limitCountries(filteredCountries, limit);
+
+        return ResponseEntity.ok(filteredCountries);
+    }
+
+    private List<Country> filterCountries(Country[] countries, String county, Long population) {
+        // Implement filtering logic based on county and population
+        // You can use streams or loops to filter the countries
+        // Return a list of filtered countries
+        return null;
+    }
+
+    private void sortCountries(List<Country> countries, SortOrder sortOrder) {
+        // Implement sorting logic based on the sortOrder parameter
+        // Use Collections.sort or Stream API to sort the countries list
+    }
+
+    private void limitCountries(List<Country> countries, Integer limit) {
+        // Implement limiting logic based on the limit parameter
+        // Use List.subList to get the desired number of countries
+    }
+}
+
+enum SortOrder {
+    ASC, DESC
+}
+
+class Country {
+    // Define your Country class structure here
+    // You should have fields that match the properties of the response from the API
+}
+
+Please note that you'll need to define the Country class structure to match the properties of the response from the API. Additionally, you'll need to implement the filtering, sorting, and limiting logic in the respective methods. The SortOrder enum is used to represent the sorting order (ASC or DESC).
+
+Remember that this is a basic example and may require further customization based on your specific requirements and the structure of the API response. Also, you'll need to handle exceptions, error responses, and perform appropriate error checking and validation for the input parameters.
+User
+I need structure with COnfiguration where will be resttemplate.  Separate class for Service that call https://restcountries.com/v3.1/all. Please give me normal structure project 
+ChatGPT
+
+Certainly! Here's a more organized structure for your Spring Boot project with separate classes for configuration, service, and controller:
+
+    Create a Spring Boot application class:
+
+java
+
+@SpringBootApplication
+public class SpringBootApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(SpringBootApp.class, args);
+    }
+}
+
+    Create a configuration class for the RestTemplate:
+
+java
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
+
+@Configuration
+public class RestTemplateConfig {
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+}
+
+    Create a service class to interact with the external API:
+
+java
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+@Service
+public class CountryService {
+
+    private final String API_URL = "https://restcountries.com/v3.1/all";
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    public Country[] getCountriesFromApi() {
+        return restTemplate.getForObject(API_URL, Country[].class);
+    }
+}
+
+    Create the Country class to represent the API response:
+
+java
+
+public class Country {
+    // Define your Country class structure here
+    // Match the properties of the response from the API
+}
+
+    Create the controller class for handling requests:
+
+java
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+public class CountryController {
+
+    @Autowired
+    private CountryService countryService;
+
+    @GetMapping(value = "/countries", produces = {"application/xml", "application/json"})
+    public ResponseEntity<List<Country>> getCountries(
+            @RequestParam(required = false) String county,
+            @RequestParam(required = false) Long population,
+            @RequestParam(required = false) SortOrder sortOrder,
+            @RequestParam(required = false) Integer limit) {
+
+        Country[] countries = countryService.getCountriesFromApi();
+
+        List<Country> filteredCountries = // Implement filtering logic
+        // ...
+
+        sortCountries(filteredCountries, sortOrder);
+        limitCountries(filteredCountries, limit);
+
+        return ResponseEntity.ok(filteredCountries);
+    }
+
+    // Other methods for sorting, limiting, etc.
+}
+
+    Define the SortOrder enum as shown in the previous response.
+
+Remember to implement the filtering, sorting, and limiting logic in the controller, and complete the Country class structure to match the API response. Also, handle exceptions, error responses, and add necessary validation based on your requirements.
+
+This structure follows the best practices for Spring Boot projects by separating concerns into different classes.
+User
+getCountriesFromApi need to return list
+ChatGPT
+
+Certainly! Here's the updated code to return a List<Country> from the getCountriesFromApi method in the CountryService class:
+
+java
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.Arrays;
+import java.util.List;
+
+@Service
+public class CountryService {
+
+    private final String API_URL = "https://restcountries.com/v3.1/all";
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    public List<Country> getCountriesFromApi() {
+        Country[] countries = restTemplate.getForObject(API_URL, Country[].class);
+        return Arrays.asList(countries);
+    }
+}
+
+The getCountriesFromApi method now converts the array of countries received from the API into a List<Country> using Arrays.asList(countries). This way, you can work with a List instead of an array in your service and controller methods. The rest of the structure and logic in the controller and other classes remains the same.
+User
+you can use inside getForObject transfer to list
+ChatGPT
+
+Absolutely, you're correct. The RestTemplate can directly convert the response to a List<Country> using exchange method with a parameterized ParameterizedTypeReference. Here's how you can modify the getCountriesFromApi method:
+
+java
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
+
+@Service
+public class CountryService {
+
+    private final String API_URL = "https://restcountries.com/v3.1/all";
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    public List<Country> getCountriesFromApi() {
+        ResponseEntity<List<Country>> response = restTemplate.exchange(
+            API_URL,
+            HttpMethod.GET,
+            null,
+            new ParameterizedTypeReference<List<Country>>() {}
+        );
+
+        return response.getBody();
+    }
+}
+
+With this approach, the exchange method handles the conversion of the API response into a List<Country> directly. The rest of the code structure in other classes remains unchanged.
+User
+change field injection to contructor
+ChatGPT
+
+Certainly! Constructor injection is considered a better practice than field injection. Here's how you can modify the CountryService class to use constructor injection:
+
+java
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
+
+@Service
+public class CountryService {
+
+    private final String API_URL = "https://restcountries.com/v3.1/all";
+
+    private final RestTemplate restTemplate;
+
+    @Autowired
+    public CountryService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
+    public List<Country> getCountriesFromApi() {
+        ResponseEntity<List<Country>> response = restTemplate.exchange(
+            API_URL,
+            HttpMethod.GET,
+            null,
+            new ParameterizedTypeReference<List<Country>>() {}
+        );
+
+        return response.getBody();
+    }
+}
+
+By injecting the RestTemplate through the constructor, you ensure that the required dependency is always available when the CountryService instance is created. This promotes better encapsulation and makes it clear what dependencies are required for the class to function correctly. The rest of the code structure in other classes remains the same.
+
+User
+add exception EntriesNotFound and ControllerAdvice
+ChatGPT
+
+Sure, I can help you with that. Let's first add the custom exception class EntriesNotFoundException:
+
+    Create the EntriesNotFoundException class:
+
+java
+
+public class EntriesNotFoundException extends RuntimeException {
+
+    public EntriesNotFoundException(String message) {
+        super(message);
+    }
+}
+
+    Create a global exception handler using ControllerAdvice:
+
+java
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(EntriesNotFoundException.class)
+    public ResponseEntity<String> handleEntriesNotFoundException(EntriesNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    // Add more exception handlers for other exceptions if needed
+}
+
+    Update the CountryService class to throw the EntriesNotFoundException:
+
+java
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
+
+@Service
+public class CountryService {
+
+    private final String API_URL = "https://restcountries.com/v3.1/all";
+
+    private final RestTemplate restTemplate;
+
+    @Autowired
+    public CountryService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
+    public List<Country> getCountriesFromApi() {
+        ResponseEntity<List<Country>> response = restTemplate.exchange(
+            API_URL,
+            HttpMethod.GET,
+            null,
+            new ParameterizedTypeReference<List<Country>>() {}
+        );
+
+        List<Country> countries = response.getBody();
+
+        if (countries == null || countries.isEmpty()) {
+            throw new EntriesNotFoundException("No entries found from the API.");
+        }
+
+        return countries;
+    }
+}
+
+    Update the CountryController class to handle the exception:
+
+java
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+public class CountryController {
+
+    @Autowired
+    private CountryService countryService;
+
+    @GetMapping(value = "/countries", produces = {"application/xml", "application/json"})
+    public ResponseEntity<List<Country>> getCountries(
+            @RequestParam(required = false) String county,
+            @RequestParam(required = false) Long population,
+            @RequestParam(required = false) SortOrder sortOrder,
+            @RequestParam(required = false) Integer limit) {
+
+        List<Country> filteredCountries = countryService.getCountriesFromApi();
+
+        // Apply filtering, sorting, and limiting logic
+
+        return ResponseEntity.ok(filteredCountries);
+    }
+}
+
+With these changes, the CountryService class will throw the custom EntriesNotFoundException when there are no entries retrieved from the API. The global exception handler defined in GlobalExceptionHandler will catch this exception and return a response with an appropriate status code and message.
+User
+add to globalException catching all unpredictable exceptions
+ChatGPT
+
+Certainly! You can enhance the global exception handler to catch all unpredictable exceptions and provide a generic error response. Here's how you can modify the GlobalExceptionHandler class to achieve that:
+
+java
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(EntriesNotFoundException.class)
+    public ResponseEntity<String> handleEntriesNotFoundException(EntriesNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleGenericException(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body("An error occurred. Please try again later.");
+    }
+}
+
+In this updated code, the handleGenericException method will catch any exception that is not specifically handled by other exception handlers. It returns a generic error message with an internal server error status (HTTP 500). This way, you ensure that even if an unexpected exception occurs, the user will receive a meaningful error response.
+
+Remember to customize the error messages and status codes as needed for your application's requirements.
+User
+create java class from this json {"name":{"common":"South Africa","official":"Republic of South Africa","nativeName":{"afr":{"official":"Republiek van Suid-Afrika","common":"South Africa"},"eng":{"official":"Republic of South Africa","common":"South Africa"},"nbl":{"official":"IRiphabliki yeSewula Afrika","common":"Sewula Afrika"},"nso":{"official":"Rephaboliki ya Afrika-Borwa ","common":"Afrika-Borwa"},"sot":{"official":"Rephaboliki ya Afrika Borwa","common":"Afrika Borwa"},"ssw":{"official":"IRiphabhulikhi yeNingizimu Afrika","common":"Ningizimu Afrika"},"tsn":{"official":"Rephaboliki ya Aforika Borwa","common":"Aforika Borwa"},"tso":{"official":"Riphabliki ra Afrika Dzonga","common":"Afrika Dzonga"},"ven":{"official":"Riphabuḽiki ya Afurika Tshipembe","common":"Afurika Tshipembe"},"xho":{"official":"IRiphabliki yaseMzantsi Afrika","common":"Mzantsi Afrika"},"zul":{"official":"IRiphabliki yaseNingizimu Afrika","common":"Ningizimu Afrika"}}},"tld":[".za"],"cca2":"ZA","ccn3":"710","cca3":"ZAF","cioc":"RSA","independent":true,"status":"officially-assigned","unMember":true,"currencies":{"ZAR":{"name":"South African rand","symbol":"R"}},"idd":{"root":"+2","suffixes":["7"]},"capital":["Pretoria","Bloemfontein","Cape Town"],"altSpellings":["ZA","RSA","Suid-Afrika","Republic of South Africa"],"region":"Africa","subregion":"Southern Africa","languages":{"afr":"Afrikaans","eng":"English","nbl":"Southern Ndebele","nso":"Northern Sotho","sot":"Southern Sotho","ssw":"Swazi","tsn":"Tswana","tso":"Tsonga","ven":"Venda","xho":"Xhosa","zul":"Zulu"},"translations":{"ara":{"official":"جمهورية جنوب أفريقيا","common":"جنوب أفريقيا"},"bre":{"official":"Republik Suafrika","common":"Suafrika"},"ces":{"official":"Jihoafrická republika","common":"Jihoafrická republika"},"cym":{"official":"Republic of South Africa","common":"South Africa"},"deu":{"official":"Republik Südafrika","common":"Südafrika"},"est":{"official":"Lõuna-Aafrika Vabariik","common":"Lõuna-Aafrika Vabariik"},"fin":{"official":"Etelä-Afrikan tasavalta","common":"Etelä-Afrikka"},"fra":{"official":"République d'Afrique du Sud","common":"Afrique du Sud"},"hrv":{"official":"Južnoafrička Republika","common":"Južna Afrika"},"hun":{"official":"Dél-afrikai Köztársaság","common":"Dél-afrikai Köztársaság"},"ita":{"official":"Repubblica del Sud Africa","common":"Sud Africa"},"jpn":{"official":"南アフリカ共和国","common":"南アフリカ"},"kor":{"official":"남아프리카 공화국","common":"남아프리카"},"nld":{"official":"Republiek Zuid-Afrika","common":"Zuid-Afrika"},"per":{"official":"جمهوری آفریقای جنوبی","common":"آفریقای جنوبی"},"pol":{"official":"Republika Południowej Afryki","common":"Południowa Afryka"},"por":{"official":"República da África do Sul","common":"África do Sul"},"rus":{"official":"Южно-Африканская Республика","common":"Южная Африка"},"slk":{"official":"Juhoafrická republika","common":"Južná Afrika"},"spa":{"official":"República de Sudáfrica","common":"Sudáfrica"},"srp":{"official":"Република Јужна Африка","common":"Јужноафричка Република"},"swe":{"official":"Republiken Sydafrika","common":"Sydafrika"},"tur":{"official":"Güney Afrika Cumhuriyeti","common":"Güney Afrika"},"urd":{"official":"جمہوریہ جنوبی افریقا","common":"جنوبی افریقا"},"zho":{"official":"南非共和国","common":"南非"}},"latlng":[-29.0,24.0],"landlocked":false,"borders":["BWA","LSO","MOZ","NAM","SWZ","ZWE"],"area":1221037.0,"demonyms":{"eng":{"f":"South African","m":"South African"},"fra":{"f":"Sud-africaine","m":"Sud-africain"}},"flag":"\uD83C\uDDFF\uD83C\uDDE6","maps":{"googleMaps":"https://goo.gl/maps/CLCZ1R8Uz1KpYhRv6","openStreetMaps":"https://www.openstreetmap.org/relation/87565"},"population":59308690,"gini":{"2014":63.0},"fifa":"RSA","car":{"signs":["ZA"],"side":"left"},"timezones":["UTC+02:00"],"continents":["Africa"],"flags":{"png":"https://flagcdn.com/w320/za.png","svg":"https://flagcdn.com/za.svg","alt":"The flag of South Africa is composed of two equal horizontal bands of red and blue, with a yellow-edged black isosceles triangle superimposed on the hoist side of the field. This triangle has its base centered on the hoist end, spans about two-fifth the width and two-third the height of the field, and is enclosed on its sides by the arms of a white-edged green horizontally oriented Y-shaped band which extends along the boundary of the red and blue bands to the fly end of the field."},"coatOfArms":{"png":"https://mainfacts.com/media/images/coats_of_arms/za.png","svg":"https://mainfacts.com/media/images/coats_of_arms/za.svg"},"startOfWeek":"monday","capitalInfo":{"latlng":[-25.7,28.22]},"postalCode":{"format":"####","regex":"^(\\d{4})$"}}
+ChatGPT
+
+Here's a Java class representation for the provided JSON:
+
+java
+
+import java.util.List;
+import java.util.Map;
+
+public class CountryData {
+
+    private Name name;
+    private List<String> tld;
+    private String cca2;
+    private String ccn3;
+    private String cca3;
+    private String cioc;
+    private boolean independent;
+    private String status;
+    private boolean unMember;
+    private Map<String, Currency> currencies;
+    private Idd idd;
+    private List<String> capital;
+    private List<String> altSpellings;
+    private String region;
+    private String subregion;
+    private Map<String, String> languages;
+    private Translations translations;
+    private List<Double> latlng;
+    private boolean landlocked;
+    private List<String> borders;
+    private double area;
+    private Demonyms demonyms;
+    private String flag;
+    private Maps maps;
+    private int population;
+    private Gini gini;
+    private String fifa;
+    private Car car;
+    private List<String> timezones;
+    private List<String> continents;
+    private Flags flags;
+    private CoatOfArms coatOfArms;
+    private String startOfWeek;
+    private CapitalInfo capitalInfo;
+    private PostalCode postalCode;
+
+    // getters and setters for each field
+
+    static class Name {
+        private String common;
+        private String official;
+        private Map<String, NativeName> nativeName;
+
+        // getters and setters
+    }
+
+    static class NativeName {
+        private String official;
+        private String common;
+
+        // getters and setters
+    }
+
+    static class Currency {
+        private String name;
+        private String symbol;
+
+        // getters and setters
+    }
+
+    static class Idd {
+        private String root;
+        private List<String> suffixes;
+
+        // getters and setters
+    }
+
+    static class Translations {
+        private Map<String, Translation> translations;
+
+        // getters and setters
+    }
+
+    static class Translation {
+        private String official;
+        private String common;
+
+        // getters and setters
+    }
+
+    static class Demonyms {
+        private Map<String, Demonym> demonyms;
+
+        // getters and setters
+    }
+
+    static class Demonym {
+        private String f;
+        private String m;
+
+        // getters and setters
+    }
+
+    static class Gini {
+        private double _2014;
+
+        // getters and setters
+    }
+
+    static class Car {
+        private List<String> signs;
+        private String side;
+
+        // getters and setters
+    }
+
+    static class Flags {
+        private String png;
+        private String svg;
+        private String alt;
+
+        // getters and setters
+    }
+
+    static class CoatOfArms {
+        private String png;
+        private String svg;
+
+        // getters and setters
+    }
+
+    static class Maps {
+        private String googleMaps;
+        private String openStreetMaps;
+
+        // getters and setters
+    }
+
+    static class CapitalInfo {
+        private List<Double> latlng;
+
+        // getters and setters
+    }
+
+    static class PostalCode {
+        private String format;
+        private String regex;
+
+        // getters and setters
+    }
+}
+
+Please note that the structure of this class corresponds to the structure of the provided JSON. You can use this class to parse the JSON data using libraries like Jackson or Gson. Also, make sure to include appropriate getters and setters for each field.
+User
+add lomboc dependency to maven
+ChatGPT
+
+To add Lombok as a dependency to your Maven project, you need to include the Lombok dependency in your pom.xml file. Here's how you can do that:
+
+    Open your pom.xml file.
+
+    Inside the <dependencies> section, add the following Lombok dependency:
+
+xml
+
+<dependency>
+    <groupId>org.projectlombok</groupId>
+    <artifactId>lombok</artifactId>
+    <version>1.18.22</version> <!-- Use the latest version available -->
+    <scope>provided</scope>
+</dependency>
+
+    Save the pom.xml file.
+
+The <scope>provided</scope> is used to indicate that Lombok should only be used at compile time and not included in the runtime dependencies.
+
+After adding the Lombok dependency, you can use Lombok annotations such as @Data, @Getter, @Setter, @NoArgsConstructor, @AllArgsConstructor, and more to automatically generate boilerplate code for your classes. Remember to also install the Lombok plugin for your IDE (e.g., IntelliJ IDEA, Eclipse) to enable proper code highlighting and support for the Lombok annotations.
+
+Note: Make sure to update the Lombok version to the latest available version. You can find the latest version on the Lombok website.
+User
+
