@@ -1,0 +1,59 @@
+I need java function that accepts a string as a parameter and can filter by country `name/common`.  
+
+The filter should search for countries names that contains string from attributes (e.g., providing `st` as attribute I could find `Estonia`, providing `Sp` I could find `Spain`) 
+
+search should be case insensitive (e.g., providing `sT` should find `Estonia`) 
+ChatGPT
+
+Certainly! You can create a Java function that takes a string parameter and filters a list of countries based on their common names, allowing for a case-insensitive search. Here's an example implementation using Java:
+
+java
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+class Country {
+    private String name;
+
+    public Country(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+}
+
+public class CountryFilter {
+    public static List<Country> filterCountriesByName(List<Country> countries, String searchString) {
+        String searchLowerCase = searchString.toLowerCase();
+        
+        List<Country> filteredCountries = countries.stream()
+            .filter(country -> country.getName().toLowerCase().contains(searchLowerCase))
+            .collect(Collectors.toList());
+
+        return filteredCountries;
+    }
+
+    public static void main(String[] args) {
+        List<Country> countries = new ArrayList<>();
+        countries.add(new Country("Estonia"));
+        countries.add(new Country("Spain"));
+        countries.add(new Country("Germany"));
+        countries.add(new Country("United States"));
+        
+        String searchAttribute = "st";
+        
+        List<Country> filteredCountries = filterCountriesByName(countries, searchAttribute);
+        
+        System.out.println("Countries containing '" + searchAttribute + "':");
+        for (Country country : filteredCountries) {
+            System.out.println(country.getName());
+        }
+    }
+}
+
+In this example, the Country class represents a country with its common name. The filterCountriesByName function takes a list of Country objects and a search string as parameters, and it returns a list of filtered countries that match the search criteria. The search is performed in a case-insensitive manner by converting both the search string and the country names to lowercase before comparison.
+
+You can modify this code to suit your specific project needs and integrate it with your existing codebase.
