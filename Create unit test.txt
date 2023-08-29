@@ -1,0 +1,181 @@
+I need unit tests for all functions @Service
+public class CountryService {
+
+  private final CountryClient countryClient;
+
+  @Autowired
+  public CountryService(CountryClient countryClient) {
+    this.countryClient = countryClient;
+  }
+
+  public List<Country> retrieveCounties(String country, Long population, SortOrder sortOrder, Integer limit) {
+    List<Country> filteredCountries = countryClient.getCountriesFromApi();
+    if (country != null) {
+      filteredCountries = filterCountriesByName(filteredCountries, country);
+    }
+
+    if (population != null) {
+      filteredCountries = filterCountriesByPopulation(filteredCountries, population);
+    }
+
+    if (sortOrder != null) {
+      filteredCountries = sortCountries(filteredCountries, sortOrder);
+    }
+
+    if (limit != null) {
+      filteredCountries = limitRecords(filteredCountries, limit);
+    }
+
+    return filteredCountries;
+  }
+
+  private List<Country> filterCountriesByName(List<Country> countries, String searchString) {
+    String searchLowerCase = searchString.toLowerCase();
+
+    return countries.stream()
+        .filter(country -> country.getName().getCommon().toLowerCase().contains(searchLowerCase))
+        .collect(Collectors.toList());
+  }
+
+  private List<Country> filterCountriesByPopulation(List<Country> countries, Long maxPopulation) {
+    return countries.stream()
+        .filter(country -> country.getPopulation() < maxPopulation * 1000000)
+        .collect(Collectors.toList());
+  }
+
+  private List<Country> sortCountries(List<Country> countries, SortOrder sortOrder) {
+    Comparator<Country> comparator = Comparator.comparing(v -> v.getName().getCommon());
+    if (sortOrder == SortOrder.DESC) {
+      comparator = comparator.reversed();
+    }
+    return countries.stream()
+        .sorted(comparator)
+        .collect(Collectors.toList());
+  }
+
+  private List<Country> limitRecords(List<Country> records, int n) {
+    return records.stream()
+        .limit(n)
+        .collect(Collectors.toList());
+  }
+
+}
+ChatGPT
+
+Writing unit tests for your CountryService class can greatly improve the reliability of your codebase. Here's an example of how you can write unit tests for each of the functions in your CountryService class using JUnit and Mockito for mocking dependencies. Make sure you have the appropriate testing dependencies in your project's build configuration.
+
+java
+
+import static org.mockito.Mockito.*;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+class CountryServiceTest {
+
+    @Mock
+    private CountryClient countryClient;
+
+    private CountryService countryService;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        countryService = new CountryService(countryClient);
+    }
+
+    @Test
+    void testRetrieveCounties_withAllFilters() {
+        // Mock data
+        List<Country> countries = Arrays.asList(
+            new Country("CountryA", 1000000),
+            new Country("CountryB", 2000000)
+            // Add more mock data as needed
+        );
+        when(countryClient.getCountriesFromApi()).thenReturn(countries);
+
+        // Test parameters
+        String country = "Country";
+        Long population = 1L;
+        SortOrder sortOrder = SortOrder.DESC;
+        Integer limit = 1;
+
+        // Call the method
+        List<Country> result = countryService.retrieveCounties(country, population, sortOrder, limit);
+
+        // Assertion
+        // Add your assertions based on the expected result
+    }
+
+    @Test
+    void testFilterCountriesByName() {
+        // Mock data
+        List<Country> countries = Arrays.asList(
+            new Country("CountryA", 1000000),
+            new Country("CountryB", 2000000)
+            // Add more mock data as needed
+        );
+
+        // Call the method
+        List<Country> result = countryService.filterCountriesByName(countries, "CountryA");
+
+        // Assertion
+        // Add your assertions based on the expected result
+    }
+
+    @Test
+    void testFilterCountriesByPopulation() {
+        // Mock data
+        List<Country> countries = Arrays.asList(
+            new Country("CountryA", 1000000),
+            new Country("CountryB", 2000000)
+            // Add more mock data as needed
+        );
+
+        // Call the method
+        List<Country> result = countryService.filterCountriesByPopulation(countries, 1L);
+
+        // Assertion
+        // Add your assertions based on the expected result
+    }
+
+    @Test
+    void testSortCountries() {
+        // Mock data
+        List<Country> countries = Arrays.asList(
+            new Country("CountryB", 2000000),
+            new Country("CountryA", 1000000)
+            // Add more mock data as needed
+        );
+
+        // Call the method
+        List<Country> result = countryService.sortCountries(countries, SortOrder.ASC);
+
+        // Assertion
+        // Add your assertions based on the expected result
+    }
+
+    @Test
+    void testLimitRecords() {
+        // Mock data
+        List<Country> countries = Arrays.asList(
+            new Country("CountryA", 1000000),
+            new Country("CountryB", 2000000)
+            // Add more mock data as needed
+        );
+
+        // Call the method
+        List<Country> result = countryService.limitRecords(countries, 1);
+
+        // Assertion
+        // Add your assertions based on the expected result
+    }
+}
+
+In these tests, you are creating mock data, defining expected results, and verifying that the methods of your CountryService class behave as expected. You'll need to replace the comments in the assertions sections with actual assertions based on the expected outcomes for each test case.

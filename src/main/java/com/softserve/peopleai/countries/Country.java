@@ -3,11 +3,13 @@ package com.softserve.peopleai.countries;
 import java.util.List;
 import java.util.Map;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
 public class Country {
 
   private Name name;
@@ -84,6 +86,7 @@ public class Country {
 
   @Getter
   @Setter
+  @Builder
   static class Name {
 
     private String common;

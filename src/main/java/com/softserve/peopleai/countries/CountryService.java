@@ -38,7 +38,7 @@ public class CountryService {
     return filteredCountries;
   }
 
-  private List<Country> filterCountriesByName(List<Country> countries, String searchString) {
+  protected List<Country> filterCountriesByName(List<Country> countries, String searchString) {
     String searchLowerCase = searchString.toLowerCase();
 
     return countries.stream()
@@ -46,13 +46,13 @@ public class CountryService {
         .collect(Collectors.toList());
   }
 
-  private List<Country> filterCountriesByPopulation(List<Country> countries, Long maxPopulation) {
+  protected List<Country> filterCountriesByPopulation(List<Country> countries, Long maxPopulation) {
     return countries.stream()
         .filter(country -> country.getPopulation() < maxPopulation * 1000000)
         .collect(Collectors.toList());
   }
 
-  private List<Country> sortCountries(List<Country> countries, SortOrder sortOrder) {
+  protected List<Country> sortCountries(List<Country> countries, SortOrder sortOrder) {
     Comparator<Country> comparator = Comparator.comparing(v -> v.getName().getCommon());
     if (sortOrder == SortOrder.DESC) {
       comparator = comparator.reversed();
@@ -62,7 +62,7 @@ public class CountryService {
         .collect(Collectors.toList());
   }
 
-  private List<Country> limitRecords(List<Country> records, int n) {
+  protected List<Country> limitRecords(List<Country> records, int n) {
     return records.stream()
         .limit(n)
         .collect(Collectors.toList());
