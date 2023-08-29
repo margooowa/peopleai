@@ -2,7 +2,6 @@ package com.softserve.peopleai.countries;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,13 +42,13 @@ public class CountryService {
 
     return countries.stream()
         .filter(country -> country.getName().getCommon().toLowerCase().contains(searchLowerCase))
-        .collect(Collectors.toList());
+        .toList();
   }
 
   protected List<Country> filterCountriesByPopulation(List<Country> countries, Long maxPopulation) {
     return countries.stream()
         .filter(country -> country.getPopulation() < maxPopulation * 1000000)
-        .collect(Collectors.toList());
+        .toList();
   }
 
   protected List<Country> sortCountries(List<Country> countries, SortOrder sortOrder) {
@@ -59,13 +58,13 @@ public class CountryService {
     }
     return countries.stream()
         .sorted(comparator)
-        .collect(Collectors.toList());
+        .toList();
   }
 
   protected List<Country> limitRecords(List<Country> records, int n) {
     return records.stream()
         .limit(n)
-        .collect(Collectors.toList());
+        .toList();
   }
 
 }
