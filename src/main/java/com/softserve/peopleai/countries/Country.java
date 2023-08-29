@@ -58,7 +58,7 @@ public class Country {
 
   private Maps maps;
 
-  private int population;
+  private Long population;
 
   private Gini gini;
 

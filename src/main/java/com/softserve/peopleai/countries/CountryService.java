@@ -28,4 +28,11 @@ public class CountryService {
         .filter(country -> country.getName().getCommon().toLowerCase().contains(searchLowerCase))
         .collect(Collectors.toList());
   }
+
+  public  List<Country> filterCountriesByPopulation(List<Country> countries, Long maxPopulation) {
+    return countries.stream()
+        .filter(country -> country.getPopulation() < maxPopulation * 1000000)
+        .collect(Collectors.toList());
+  }
+
 }
