@@ -1,6 +1,5 @@
 package com.softserve.peopleai.countries;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,12 +17,28 @@ public class CountryService {
     this.countryClient = countryClient;
   }
 
-  public List<Country> retrieveCounties() {
-    List<Country> countriesAll = countryClient.getCountriesFromApi();
-    return countriesAll;
+  public List<Country> retrieveCounties(String country, Long population, SortOrder sortOrder, Integer limit) {
+    List<Country> filteredCountries = countryClient.getCountriesFromApi();
+    if (country != null) {
+      filteredCountries = filterCountriesByName(filteredCountries, country);
+    }
+
+    if (population != null) {
+      filteredCountries = filterCountriesByPopulation(filteredCountries, population);
+    }
+
+    if (sortOrder != null) {
+      filteredCountries = sortCountries(filteredCountries, sortOrder);
+    }
+
+    if (limit != null) {
+      filteredCountries = limitRecords(filteredCountries, limit);
+    }
+
+    return filteredCountries;
   }
 
-  public List<Country> filterCountriesByName(List<Country> countries, String searchString) {
+  private List<Country> filterCountriesByName(List<Country> countries, String searchString) {
     String searchLowerCase = searchString.toLowerCase();
 
     return countries.stream()
@@ -31,20 +46,26 @@ public class CountryService {
         .collect(Collectors.toList());
   }
 
-  public List<Country> filterCountriesByPopulation(List<Country> countries, Long maxPopulation) {
+  private List<Country> filterCountriesByPopulation(List<Country> countries, Long maxPopulation) {
     return countries.stream()
         .filter(country -> country.getPopulation() < maxPopulation * 1000000)
         .collect(Collectors.toList());
   }
 
-  public void sortCountries(List<Country> countries, SortOrder sortOrder) {
-    Collections.sort(countries, (country1, country2) -> {
-      if (sortOrder == SortOrder.ASC) {
-        return country1.getName().getCommon().compareTo(country2.getName().getCommon());
-      } else {
-        return country2.getName().getCommon().compareTo(country1.getName().getCommon());
-      }
-    });
+  private List<Country> sortCountries(List<Country> countries, SortOrder sortOrder) {
+    Comparator<Country> comparator = Comparator.comparing(v -> v.getName().getCommon());
+    if (sortOrder == SortOrder.DESC) {
+      comparator = comparator.reversed();
+    }
+    return countries.stream()
+        .sorted(comparator)
+        .collect(Collectors.toList());
+  }
+
+  private List<Country> limitRecords(List<Country> records, int n) {
+    return records.stream()
+        .limit(n)
+        .collect(Collectors.toList());
   }
 
 }

@@ -1,0 +1,67 @@
+I need using function for filtering sorting and limit , all parameterc can be null, change this code  public List<Country> retrieveCounties(String county, Long population, SortOrder sortOrder, Integer limit) {
+    List<Country> countriesAll = countryClient.getCountriesFromApi();
+    return countriesAll;
+  }
+
+  private List<Country> filterCountriesByName(List<Country> countries, String searchString) {
+    String searchLowerCase = searchString.toLowerCase();
+
+    return countries.stream()
+        .filter(country -> country.getName().getCommon().toLowerCase().contains(searchLowerCase))
+        .collect(Collectors.toList());
+  }
+
+  private List<Country> filterCountriesByPopulation(List<Country> countries, Long maxPopulation) {
+    return countries.stream()
+        .filter(country -> country.getPopulation() < maxPopulation * 1000000)
+        .collect(Collectors.toList());
+  }
+
+  private List<Country> sortCountries(List<Country> countries, SortOrder sortOrder) {
+    Comparator<Country> comparator = Comparator.comparing(v -> v.getName().getCommon());
+    if (sortOrder == SortOrder.DESC) {
+      comparator = comparator.reversed();
+    }
+    return countries.stream()
+        .sorted(comparator)
+        .collect(Collectors.toList());
+  }
+
+  private List<Country> limitRecords(List<Country> records, int n) {
+    return records.stream()
+        .limit(n)
+        .collect(Collectors.toList());
+  }
+ChatGPT
+
+Certainly! If you want to modify your code to handle null parameters for filtering, sorting, and limiting, you can update the retrieveCounties function like this:
+
+java
+
+public List<Country> retrieveCounties(String county, Long population, SortOrder sortOrder, Integer limit) {
+    List<Country> countriesAll = countryClient.getCountriesFromApi();
+    
+    List<Country> filteredCountries = countriesAll;
+
+    if (county != null) {
+        filteredCountries = filterCountriesByName(filteredCountries, county);
+    }
+    
+    if (population != null) {
+        filteredCountries = filterCountriesByPopulation(filteredCountries, population);
+    }
+    
+    if (sortOrder != null) {
+        filteredCountries = sortCountries(filteredCountries, sortOrder);
+    }
+    
+    if (limit != null) {
+        filteredCountries = limitRecords(filteredCountries, limit);
+    }
+
+    return filteredCountries;
+}
+
+Now, the retrieveCounties function checks each parameter for null before applying the respective filter, sort, or limit operation. If the parameter is not null, it applies the corresponding operation on the list of countries.
+
+This way, you can call the retrieveCounties function with any combination of parameters, and it will perform the filtering, sorting, and limiting as specified by the provided parameters.
